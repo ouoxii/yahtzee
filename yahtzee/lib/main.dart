@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,25 +41,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Yahtzee"),
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _diceEmojis[_diceIndex],
-              style: const TextStyle(
-                fontSize: 200,
-                color: Colors.orange,
+              "Yahtzee",
+              style: GoogleFonts.shadowsIntoLight(
+                fontSize: 30,
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _diceIndex = Random().nextInt(6);
-                });
-              },
-              child: const Text('Play'),
-            ),
+            Text("player1")
           ],
         ),
       ),
