@@ -30,8 +30,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Player player1 = Player(name: 'usagi');
-  List<bool> isSelected = List.generate(20, (_) => false);
-
+  List<bool> _selectedDice = List.filled(5, false);
   final _diceEmojis = [
     '',
     '⚀',
@@ -41,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
     '⚄',
     '⚅',
   ];
-  List<int> _diceIndex = [0, 0, 0, 0, 0];
+  List<int> _diceIndex = [6, 6, 6, 6, 6];
   List<String> categories = [
     'Ones',
     'Twos',
@@ -119,11 +118,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     _diceIndex.length,
-                    (index) => Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        '${_diceEmojis[_diceIndex[index]]}',
-                        style: TextStyle(fontSize: 36),
+                    (index) => GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedDice[index] = !_selectedDice[index];
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _selectedDice[index]
+                              ? Colors.blue
+                              : Colors.transparent, // Change color on selection
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          _diceEmojis[_diceIndex[index]],
+                          style: TextStyle(
+                              fontSize: 36,
+                              color: _selectedDice[index]
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
                       ),
                     ),
                   ),
@@ -137,7 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () {
                     setState(() {
                       for (var i = 0; i < 5; i++) {
-                        _diceIndex[i] = Random().nextInt(6) + 1;
+                        if (!_selectedDice[i]) {
+                          _diceIndex[i] = Random().nextInt(6) + 1;
+                        }
                       }
                     });
                   },
@@ -145,9 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      //將骰子的值存入player
-                    });
+                    setState(() {});
                   },
                   child: const Text('Play'),
                 ),
