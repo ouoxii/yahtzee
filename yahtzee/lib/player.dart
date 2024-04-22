@@ -36,4 +36,8 @@ class Player {
   int getScore(String category) {
     return scores[category] ?? 0;
   }
+
+  bool getScored(String category) {
+    return scores[category] != 0;
+  }
 }
