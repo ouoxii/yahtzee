@@ -33,6 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<bool> isSelected = List.generate(20, (_) => false);
 
   final _diceEmojis = [
+    '',
     '⚀',
     '⚁',
     '⚂',
@@ -80,41 +81,36 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('SCORE:' + player1.score.toString()),
               ],
             ),
-            Row(
-                //目前記錄
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 350,
-                      margin: EdgeInsets.only(left: 100),
-                      child: ListView.builder(
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          String category = categories[index];
-                          int score = player1.getScore(category);
-                          return ListTile(
-                            title: Text('$category: $score'),
-                          );
-                        },
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              Container(
+                height: 350,
+                child: Column(
+                  children: List.generate(
+                    categories.length,
+                    (index) => Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Text(
+                        '${categories[index]}: ${player1.getScore(categories[index])}',
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      height: 350,
-                      child: ListView.builder(
-                        itemCount: categories2.length,
-                        itemBuilder: (context, index) {
-                          String category = categories2[index];
-                          int score = player1.getScore(category);
-                          return ListTile(
-                            title: Text('$category: $score'),
-                          );
-                        },
+                ),
+              ),
+              Container(
+                height: 350,
+                child: Column(
+                  children: List.generate(
+                    categories2.length,
+                    (index) => Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Text(
+                        '${categories2[index]}: ${player1.getScore(categories2[index])}',
                       ),
                     ),
                   ),
-                ]),
+                ),
+              )
+            ]),
             Container(
               height: 100,
               child: SingleChildScrollView(
@@ -124,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: List.generate(
                     _diceIndex.length,
                     (index) => Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10), // 添加水平间距
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         '${_diceEmojis[_diceIndex[index]]}',
                         style: TextStyle(fontSize: 36),
@@ -141,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () {
                     setState(() {
                       for (var i = 0; i < 5; i++) {
-                        _diceIndex[i] = Random().nextInt(6);
+                        _diceIndex[i] = Random().nextInt(6) + 1;
                       }
                     });
                   },
