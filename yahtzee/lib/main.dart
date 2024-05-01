@@ -60,6 +60,67 @@ class _MyHomePageState extends State<MyHomePage> {
     'Chance',
     'Full_House',
   ];
+  int caculateScore(List<int> dice, String category) {
+    if (category == 'Ones') {
+      return dice.where((element) => element == 1).length;
+    }
+    if (category == 'Twos') {
+      return dice.where((element) => element == 2).length * 2;
+    }
+    if (category == 'Threes') {
+      return dice.where((element) => element == 3).length * 3;
+    }
+    if (category == 'Fours') {
+      return dice.where((element) => element == 4).length * 4;
+    }
+    if (category == 'Fives') {
+      return dice.where((element) => element == 5).length * 5;
+    }
+    if (category == 'Sixes') {
+      return dice.where((element) => element == 6).length * 6;
+    }
+    if (category == 'Three_of_a_kind') {
+      if (dice.toSet().length <= 3) {
+        return dice.reduce((a, b) => a + b);
+      } else
+        return 0;
+    }
+    if (category == 'Four_of_a_kind') {
+      if (dice.toSet().length == 2) {
+        return dice.reduce((a, b) => a + b);
+      } else
+        return 0;
+    }
+    if (category == 'Small_Straight') {
+      if (dice.toSet().length == 4) {
+        return 30;
+      } else
+        return 0;
+    }
+    if (category == 'Large_Straight') {
+      if (dice.toSet().length == 5) {
+        return 40;
+      } else
+        return 0;
+    }
+    if (category == 'Yahtzee') {
+      if (dice.toSet().length == 1) {
+        return 50;
+      } else
+        return 0;
+    }
+    if (category == 'Chance') {
+      return dice.reduce((a, b) => a + b);
+    }
+    if (category == 'Full_House') {
+      if (dice.toSet().length == 2) {
+        return 25;
+      } else
+        return 0;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                 height: 350,
                 child: Column(
+
                   children: List.generate(
                     categories.length,
                     (index) => GestureDetector(
@@ -103,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         padding: EdgeInsets.all(5),
                         child: Text(
-                          '${categories[index]}: ${player1.getScore(categories[index])}',
+                          '${categories[index]}: ${player1.getScore(categories[index])} ${caculateScore(_diceIndex, categories[index])}',
                         ),
                       ),
                     ),
@@ -130,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         padding: EdgeInsets.all(5),
                         child: Text(
-                          '${categories2[index]}: ${player1.getScore(categories2[index])}',
+                          '${categories2[index]}: ${player1.getScore(categories2[index])} ${caculateScore(_diceIndex, categories2[index])}',
                         ),
                       ),
                     ),
@@ -198,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           case 1:
                             if (!player1
                                 .getScored(categories[chooseCategory])) {
-                              var total = caculate(
+                              var total = caculateScore(
                                   _diceIndex, categories[chooseCategory]);
                               player1.setScore(
                                   categories[chooseCategory], total);
@@ -213,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           case 2:
                             if (!player1
                                 .getScored(categories2[chooseCategory - 10])) {
-                              var total = caculate(
+                              var total = caculateScore(
                                   _diceIndex, categories2[chooseCategory - 10]);
                               player1.setScore(
                                   categories2[chooseCategory - 10], total);
@@ -238,65 +300,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
-
-int caculate(List<int> dice, String category) {
-  if (category == 'Ones') {
-    return dice.where((element) => element == 1).length;
-  }
-  if (category == 'Twos') {
-    return dice.where((element) => element == 2).length * 2;
-  }
-  if (category == 'Threes') {
-    return dice.where((element) => element == 3).length * 3;
-  }
-  if (category == 'Fours') {
-    return dice.where((element) => element == 4).length * 4;
-  }
-  if (category == 'Fives') {
-    return dice.where((element) => element == 5).length * 5;
-  }
-  if (category == 'Sixes') {
-    return dice.where((element) => element == 6).length * 6;
-  }
-  if (category == 'Three_of_a_kind') {
-    if (dice.toSet().length <= 3) {
-      return dice.reduce((a, b) => a + b);
-    } else
-      return 0;
-  }
-  if (category == 'Four_of_a_kind') {
-    if (dice.toSet().length == 2) {
-      return dice.reduce((a, b) => a + b);
-    } else
-      return 0;
-  }
-  if (category == 'Small_Straight') {
-    if (dice.toSet().length == 4) {
-      return 30;
-    } else
-      return 0;
-  }
-  if (category == 'Large_Straight') {
-    if (dice.toSet().length == 5) {
-      return 40;
-    } else
-      return 0;
-  }
-  if (category == 'Yahtzee') {
-    if (dice.toSet().length == 1) {
-      return 50;
-    } else
-      return 0;
-  }
-  if (category == 'Chance') {
-    return dice.reduce((a, b) => a + b);
-  }
-  if (category == 'Full_House') {
-    if (dice.toSet().length == 2) {
-      return 25;
-    } else
-      return 0;
-  }
-  return 0;
 }
