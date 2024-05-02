@@ -16,8 +16,14 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Flutter Demo'),
+        ),
+        body: MyHomePage(),
+      ),
     );
   }
 }
@@ -124,15 +130,180 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Title(player1: player1),
-            Container(
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Stack(
+      children: [
+        // 中间区域显示数据
+        Positioned(
+          top: 0,
+          bottom: screenHeight * 0.3, // 底部方形区域的高度为屏幕高度的30%
+          left: 0,
+          right: 0,
+          child: Container(
+            color: Color(0xFF846E89), // 中间区域的背景颜色
+            child: Center(
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(
+                          categories.length,
+                          (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                chooseCategory = index;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: index == chooseCategory
+                                    ? Color(0xFFAE98B6)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.all(5),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image(
+                                      image: AssetImage(
+                                          'dice/${categories[index]}.png'),
+                                      width: 45,
+                                      height: 45,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+                                      width: 45,
+                                      height: 45,
+                                      color: Color(0xFFEAE0E9),
+                                      child: Center(
+                                        child: Text(
+                                          '${player1.getScore(categories[index])}',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+                                      width: 45,
+                                      height: 45,
+                                      color: Color(0xFFEAE0E9),
+                                      child: Center(
+                                        child: Text(
+                                          '${caculateScore(_diceIndex, categories[index])}',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(
+                          categories2.length,
+                          (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                chooseCategory = index + 10;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: index + 10 == chooseCategory
+                                    ? Color(0xFFAE98B6)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.all(5),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    // child: Image(
+                                    //   image: AssetImage(
+                                    //       'dice/${categories[index - 10]}.png'),
+                                    //   width: 45,
+                                    //   height: 45,
+                                    // ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+                                      width: 45,
+                                      height: 45,
+                                      color: Color(0xFFEAE0E9),
+                                      child: Center(
+                                        child: Text(
+                                          '${player1.getScore(categories2[index])}',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+                                      width: 45,
+                                      height: 45,
+                                      color: Color(0xFFEAE0E9),
+                                      child: Center(
+                                        child: Text(
+                                          '${caculateScore(_diceIndex, categories2[index])}',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: screenHeight * 0.3,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30.0),
+                topRight: Radius.circular(30.0),
+              ),
+            ),
+            child: Container(
+              //骰色子區
+              margin: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 21, 4, 40), // 設置背景顏色
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -142,234 +313,123 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 350,
+                  Center(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        categories.length,
-                        (index) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              chooseCategory = index;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: index == chooseCategory
-                                  ? Colors.blue
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(5),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image(
-                                    image: AssetImage(
-                                        'dice/${categories[index]}.png'),
-                                    width: 45,
-                                    height: 45,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(
+                            _diceIndex.length,
+                            (index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (round > 0) {
+                                    _selectedDice[index] =
+                                        !_selectedDice[index];
+                                  }
+                                });
+                              },
+                              child: Container(
+                                  width: 45,
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                    color: _selectedDice[index]
+                                        ? Colors.blue
+                                        : Colors
+                                            .transparent, // Change color on selection
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                ),
-                                Text(
-                                  '${player1.getScore(categories[index])}',
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  '${caculateScore(_diceIndex, categories[index])}',
-                                ),
-                              ],
+                                  child: Center(
+                                    child: Text(
+                                      _diceEmojis[_diceIndex[index]],
+                                      style: TextStyle(
+                                        fontSize: 36,
+                                        color: _selectedDice[index]
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                  )),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 350,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        categories2.length,
-                        (index) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              chooseCategory = index + 10;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: index + 10 == chooseCategory
-                                  ? Colors.blue
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(5),
-                            child: Text(
-                              '${categories2[index]}: ${player1.getScore(categories2[index])} ${caculateScore(_diceIndex, categories2[index])}',
-                            ),
-                          ),
+                        SizedBox(
+                          height: 20,
                         ),
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  round++;
+                                  for (var i = 0; i < 5; i++) {
+                                    if (!_selectedDice[i] && round < 4) {
+                                      _diceIndex[i] = Random().nextInt(6) + 1;
+                                    }
+                                  }
+                                });
+                              },
+                              child: const Text('Roll Dice'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  var mode = 0;
+                                  if ((chooseCategory != 7) && (round > 0)) {
+                                    (chooseCategory < 6) ? mode = 1 : mode = 2;
+                                    switch (mode) {
+                                      case 1:
+                                        if (!player1.getScored(
+                                            categories[chooseCategory])) {
+                                          var total = caculateScore(_diceIndex,
+                                              categories[chooseCategory]);
+                                          player1.setScore(
+                                              categories[chooseCategory],
+                                              total);
+                                          round = 0;
+                                          player1.score = player1.scores.values
+                                              .reduce((a, b) => a + b);
+                                          // reset the round settings
+                                          chooseCategory = 7;
+                                          _selectedDice = List.filled(5, false);
+                                        }
+                                        break;
+                                      case 2:
+                                        if (!player1.getScored(
+                                            categories2[chooseCategory - 10])) {
+                                          var total = caculateScore(_diceIndex,
+                                              categories2[chooseCategory - 10]);
+                                          player1.setScore(
+                                              categories2[chooseCategory - 10],
+                                              total);
+                                          round = 0;
+                                          player1.score = player1.scores.values
+                                              .reduce((a, b) => a + b);
+                                          // reset the round settings
+                                          chooseCategory = 7;
+                                          _selectedDice = List.filled(5, false);
+                                        }
+                                        break;
+                                    }
+                                  }
+                                });
+                              },
+                              child: const Text('Play'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: Container(
-                //骰色子區
-                margin: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        _diceIndex.length,
-                        (index) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (round > 0) {
-                                _selectedDice[index] = !_selectedDice[index];
-                              }
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: _selectedDice[index]
-                                  ? Colors.blue
-                                  : Colors
-                                      .transparent, // Change color on selection
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              _diceEmojis[_diceIndex[index]],
-                              style: TextStyle(
-                                  fontSize: 36,
-                                  color: _selectedDice[index]
-                                      ? Colors.white
-                                      : Colors.black),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              round++;
-                              for (var i = 0; i < 5; i++) {
-                                if (!_selectedDice[i] && round < 4) {
-                                  _diceIndex[i] = Random().nextInt(6) + 1;
-                                }
-                              }
-                            });
-                          },
-                          child: const Text('Roll Dice'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              var mode = 0;
-                              if ((chooseCategory != 7) && (round > 0)) {
-                                (chooseCategory < 6) ? mode = 1 : mode = 2;
-                                switch (mode) {
-                                  case 1:
-                                    if (!player1.getScored(
-                                        categories[chooseCategory])) {
-                                      var total = caculateScore(_diceIndex,
-                                          categories[chooseCategory]);
-                                      player1.setScore(
-                                          categories[chooseCategory], total);
-                                      round = 0;
-                                      player1.score = player1.scores.values
-                                          .reduce((a, b) => a + b);
-                                      // reset the round settings
-                                      chooseCategory = 7;
-                                      _selectedDice = List.filled(5, false);
-                                    }
-                                    break;
-                                  case 2:
-                                    if (!player1.getScored(
-                                        categories2[chooseCategory - 10])) {
-                                      var total = caculateScore(_diceIndex,
-                                          categories2[chooseCategory - 10]);
-                                      player1.setScore(
-                                          categories2[chooseCategory - 10],
-                                          total);
-                                      round = 0;
-                                      player1.score = player1.scores.values
-                                          .reduce((a, b) => a + b);
-                                      // reset the round settings
-                                      chooseCategory = 7;
-                                      _selectedDice = List.filled(5, false);
-                                    }
-                                    break;
-                                }
-                              }
-                            });
-                          },
-                          child: const Text('Play'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Title extends StatelessWidget {
-  const Title({
-    super.key,
-    required this.player1,
-  });
-
-  final Player player1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text(
-          player1.name,
-          style: TextStyle(
-            color: Colors.white, // 設置文字顏色
-            fontSize: 20, // 設置文字大小
-            fontWeight: FontWeight.bold, // 設置文字加粗
-            fontFamily: 'Roboto', // 設置字體
           ),
         ),
-        Text('Score:' + player1.score.toString()),
       ],
     );
   }
