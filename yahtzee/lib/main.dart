@@ -40,15 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<bool> _selectedDice = List.filled(5, false);
   int chooseCategory = 7;
   int round = 0;
-  final _diceEmojis = [
-    '🎲',
-    '⚀',
-    '⚁',
-    '⚂',
-    '⚃',
-    '⚄',
-    '⚅',
-  ];
+  final _diceEmojis = ['🎲', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
   List<int> _diceIndex = [0, 0, 0, 0, 0];
   List<String> categories = [
     'Ones',
@@ -56,7 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
     'Threes',
     'Fours',
     'Fives',
-    'Sixes'
+    'Sixes',
+    'Bonus',
   ];
   List<String> categories2 = [
     'Three_of_a_kind',
@@ -65,9 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
     'Large_Straight',
     'Yahtzee',
     'Chance',
-    'Full_House',
+    'Full_House'
   ];
-  int caculateScore(List<int> dice, String category) {
+
+  int calculateScore(List<int> dice, String category) {
     if (category == 'Ones') {
       return dice.where((element) => element == 1).length;
     }
@@ -128,156 +122,83 @@ class _MyHomePageState extends State<MyHomePage> {
     return 0;
   }
 
+  Widget scoreWidget(int index, List<String> categoryList, int offset) {
+    bool isSelected = index + offset == chooseCategory;
+    Color bgColor = isSelected ? Color(0xFFAE98B6) : Colors.transparent;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          chooseCategory = index + offset;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: EdgeInsets.all(5),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image(
+                image: AssetImage('dice/${categoryList[index]}.png'),
+                width: 45,
+                height: 45,
+              ),
+            ),
+            SizedBox(
+                width: 45, height: 45), // Placeholder for any image or icon
+            SizedBox(width: 10),
+            clipContainer('${player1.getScore(categoryList[index])}'),
+            SizedBox(width: 10),
+            clipContainer('${calculateScore(_diceIndex, categoryList[index])}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget clipContainer(String text) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        width: 45,
+        height: 45,
+        color: Color(0xFFEAE0E9),
+        child: Center(child: Text(text)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Stack(
       children: [
-        // 中间区域显示数据
         Positioned(
           top: 0,
-          bottom: screenHeight * 0.3, // 底部方形区域的高度为屏幕高度的30%
+          bottom: screenHeight * 0.3,
           left: 0,
           right: 0,
           child: Container(
-            color: Color(0xFF846E89), // 中间区域的背景颜色
+            color: Color(0xFF846E89),
             child: Center(
               child: Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                          categories.length,
-                          (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                chooseCategory = index;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: index == chooseCategory
-                                    ? Color(0xFFAE98B6)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: EdgeInsets.all(5),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image(
-                                      image: AssetImage(
-                                          'dice/${categories[index]}.png'),
-                                      width: 45,
-                                      height: 45,
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      color: Color(0xFFEAE0E9),
-                                      child: Center(
-                                        child: Text(
-                                          '${player1.getScore(categories[index])}',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      color: Color(0xFFEAE0E9),
-                                      child: Center(
-                                        child: Text(
-                                          '${caculateScore(_diceIndex, categories[index])}',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(categories.length,
+                          (index) => scoreWidget(index, categories, 0)),
                     ),
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                          categories2.length,
-                          (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                chooseCategory = index + 10;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: index + 10 == chooseCategory
-                                    ? Color(0xFFAE98B6)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: EdgeInsets.all(5),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    // child: Image(
-                                    //   image: AssetImage(
-                                    //       'dice/${categories[index - 10]}.png'),
-                                    //   width: 45,
-                                    //   height: 45,
-                                    // ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      color: Color(0xFFEAE0E9),
-                                      child: Center(
-                                        child: Text(
-                                          '${player1.getScore(categories2[index])}',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      color: Color(0xFFEAE0E9),
-                                      child: Center(
-                                        child: Text(
-                                          '${caculateScore(_diceIndex, categories2[index])}',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(categories2.length,
+                          (index) => scoreWidget(index, categories2, 10)),
                     ),
                   ],
                 ),
@@ -285,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-
+        // Lower Container for Dice and Actions...
         Positioned(
           bottom: 0,
           left: 0,
@@ -385,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       case 1:
                                         if (!player1.getScored(
                                             categories[chooseCategory])) {
-                                          var total = caculateScore(_diceIndex,
+                                          var total = calculateScore(_diceIndex,
                                               categories[chooseCategory]);
                                           player1.setScore(
                                               categories[chooseCategory],
@@ -401,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       case 2:
                                         if (!player1.getScored(
                                             categories2[chooseCategory - 10])) {
-                                          var total = caculateScore(_diceIndex,
+                                          var total = calculateScore(_diceIndex,
                                               categories2[chooseCategory - 10]);
                                           player1.setScore(
                                               categories2[chooseCategory - 10],
