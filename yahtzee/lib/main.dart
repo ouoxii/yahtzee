@@ -40,7 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
   List<bool> _selectedDice = List.filled(5, false);
   int chooseCategory = 7;
   int round = 0;
-  final _diceEmojis = ['🎲', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+  List<String> _diceEmojis = [
+    'casino',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+  ];
   List<int> _diceIndex = [0, 0, 0, 0, 0];
   List<String> categories = [
     'Ones',
@@ -146,9 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 45,
                 height: 45,
               ),
-            ),
-            SizedBox(
-                width: 45, height: 45), // Placeholder for any image or icon
+            ), // Placeholder for any image or icon
             SizedBox(width: 10),
             clipContainer('${player1.getScore(categoryList[index])}'),
             SizedBox(width: 10),
@@ -206,7 +212,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        // Lower Container for Dice and Actions...
         Positioned(
           bottom: 0,
           left: 0,
@@ -254,23 +259,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                 });
                               },
                               child: Container(
-                                  width: 45,
-                                  height: 45,
+                                  width: 55,
+                                  height: 55,
                                   decoration: BoxDecoration(
                                     color: _selectedDice[index]
-                                        ? Colors.blue
+                                        ? Color(0xFFEAE0E9)
                                         : Colors
                                             .transparent, // Change color on selection
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
-                                    child: Text(
-                                      _diceEmojis[_diceIndex[index]],
-                                      style: TextStyle(
-                                        fontSize: 36,
-                                        color: _selectedDice[index]
-                                            ? Colors.white
-                                            : Colors.black,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image(
+                                        image: AssetImage(
+                                            'dice/${_diceEmojis[_diceIndex[index]]}.png'),
+                                        width: 45,
+                                        height: 45,
                                       ),
                                     ),
                                   )),
