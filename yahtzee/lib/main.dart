@@ -164,6 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    player1 = Player(name: 'Human', isAI: false);
+    player2 = Player(name: 'Computer', isAI: true); // Set AI player
+    currentPlayer = player1; // Start with human player
     WidgetsBinding.instance.addPostFrameCallback((_) => _showNameEntryDialog());
   }
 
@@ -221,6 +224,52 @@ class _MyHomePageState extends State<MyHomePage> {
   void togglePlayer() {
     // Switch current player
     currentPlayer = (currentPlayer == player1) ? player2 : player1;
+  }
+
+  void aiMakeMove() {
+    if (currentPlayer.isAI) {
+      int bestScore = 0;
+      String? bestCategory; // Make bestCategory nullable
+
+      // Loop through all categories to find the best move
+      for (var category in categories) {
+        if (!currentPlayer.getScored(category)) {
+          int potentialScore = calculateScore(_diceIndex, category);
+          if (potentialScore > bestScore) {
+            bestScore = potentialScore;
+            bestCategory = category;
+          }
+        }
+      }
+
+      for (var category in categories2) {
+        if (!currentPlayer.getScored(category)) {
+          int potentialScore = calculateScore(_diceIndex, category);
+          if (potentialScore > bestScore) {
+            bestScore = potentialScore;
+            bestCategory = category;
+          }
+        }
+      }
+
+      // Execute the best move if there's a valid category selected
+      if (bestCategory != null) {
+        currentPlayer.setScore(bestCategory, bestScore);
+        currentPlayer.score =
+            currentPlayer.scores.values.reduce((a, b) => a + b);
+        _resetRoundSettings();
+      }
+    }
+
+    togglePlayer(); // Move to the next player
+    checkAndHandleGameEnd(); // Check if the game is over
+  }
+
+  void _resetRoundSettings() {
+    round = 0;
+    _diceIndex = List<int>.filled(5, 0);
+    _selectedDice = List.filled(5, false);
+    chooseCategory = 7;
   }
 
   void checkAndHandleGameEnd() {
@@ -460,6 +509,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     if (!_selectedDice[i] && round < 4) {
                                       _diceIndex[i] = Random().nextInt(6) + 1;
                                     }
+                                  }
+                                  if (currentPlayer.isAI) {
+                                    aiMakeMove(); // AI calculates its move immediately after rolling
                                   }
                                 });
                               },

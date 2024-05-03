@@ -1,6 +1,7 @@
 class Player {
   String name;
   int score = 0;
+  bool isAI;
   List<String> categories = [
     'Ones',
     'Twos',
@@ -57,7 +58,7 @@ class Player {
       category: false,
   };
 
-  Player({required this.name});
+  Player({required this.name, this.isAI = false});
 
   void setScore(String category, int value) {
     if (scores.containsKey(category)) {
