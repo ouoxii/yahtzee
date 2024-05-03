@@ -89,29 +89,48 @@ class _MyHomePageState extends State<MyHomePage> {
       return dice.where((element) => element == 6).length * 6;
     }
     if (category == 'Three_of_a_kind') {
-      if (dice.toSet().length <= 3) {
+      Map<int, int> counts = {};
+      for (int d in dice) {
+        counts[d] = (counts[d] ?? 0) + 1;
+      }
+      if (counts.values.any((count) => count >= 3)) {
         return dice.reduce((a, b) => a + b);
-      } else
+      } else {
         return 0;
+      }
     }
+
     if (category == 'Four_of_a_kind') {
-      if (dice.toSet().length == 2) {
+      Map<int, int> counts = {};
+      for (int d in dice) {
+        counts[d] = (counts[d] ?? 0) + 1;
+      }
+      if (counts.values.any((count) => count >= 4)) {
         return dice.reduce((a, b) => a + b);
-      } else
+      } else {
         return 0;
+      }
     }
     if (category == 'Small_Straight') {
-      if (dice.toSet().length == 4) {
+      List<int> sortedDice = dice..sort();
+      if ([1, 2, 3, 4].every(sortedDice.contains) ||
+          [2, 3, 4, 5].every(sortedDice.contains) ||
+          [3, 4, 5, 6].every(sortedDice.contains)) {
         return 30;
-      } else
+      } else {
         return 0;
+      }
     }
     if (category == 'Large_Straight') {
-      if (dice.toSet().length == 5) {
+      List<int> sortedDice = dice..sort();
+      if ([1, 2, 3, 4, 5].every(sortedDice.contains) ||
+          [2, 3, 4, 5, 6].every(sortedDice.contains)) {
         return 40;
-      } else
+      } else {
         return 0;
+      }
     }
+
     if (category == 'Yahtzee') {
       if (dice.toSet().length == 1) {
         return 50;
@@ -122,11 +141,17 @@ class _MyHomePageState extends State<MyHomePage> {
       return dice.reduce((a, b) => a + b);
     }
     if (category == 'Full_House') {
-      if (dice.toSet().length == 2) {
+      Map<int, int> counts = {};
+      for (int d in dice) {
+        counts[d] = (counts[d] ?? 0) + 1;
+      }
+      if (counts.values.toSet().containsAll({2, 3})) {
         return 25;
-      } else
+      } else {
         return 0;
+      }
     }
+
     return 0;
   }
 
@@ -145,6 +170,28 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget scoreWidget(int index, List<String> categoryList, int offset) {
     bool isSelected = index + offset == chooseCategory;
     Color bgColor = isSelected ? Color(0xFFAE98B6) : Colors.transparent;
+
+    // Initialize score strings as empty
+    String scorePlayer1 = '', scorePlayer2 = '';
+
+    // Check for player 1's score display logic
+    if (player1.getScored(categoryList[index])) {
+      // Display the player's recorded score
+      scorePlayer1 = '${player1.getScore(categoryList[index])}';
+    } else if (currentPlayer == player1 && round > 0) {
+      // Calculate and display score only if it's player1's turn and they haven't scored yet
+      scorePlayer1 = '${calculateScore(_diceIndex, categoryList[index])}';
+    }
+
+    // Check for player 2's score display logic
+    if (player2.getScored(categoryList[index])) {
+      // Display the player's recorded score
+      scorePlayer2 = '${player2.getScore(categoryList[index])}';
+    } else if (currentPlayer == player2 && round > 0) {
+      // Calculate and display score only if it's player2's turn and they haven't scored yet
+      scorePlayer2 = '${calculateScore(_diceIndex, categoryList[index])}';
+    }
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -152,6 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       },
       child: Container(
+        height: 60,
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(10),
@@ -168,14 +216,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ), // Placeholder for any image or icon
             SizedBox(width: 10),
-            clipContainer(
-                '${player1.getScore(categoryList[index])}'), // Score for player1
+            clipContainer(scorePlayer1),
             SizedBox(width: 10),
-            clipContainer(
-                '${player2.getScore(categoryList[index])}'), // Score for player2
-            SizedBox(width: 10),
-            clipContainer(
-                '${calculateScore(_diceIndex, categoryList[index])}'), // Potential score
+            clipContainer(scorePlayer2),
           ],
         ),
       ),
@@ -216,6 +259,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       player1Score: player1.score,
                       player2Name: player2.name,
                       player2Score: player2.score,
+                      currentPlayerName:
+                          currentPlayer.name, // Pass the current player's name
                     ),
                   ),
                   Row(
@@ -353,6 +398,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               .reduce((a, b) => a + b);
                                           // reset the round settings
                                           chooseCategory = 7;
+                                          _diceIndex = List<int>.filled(
+                                              _diceIndex.length, 0);
                                           _selectedDice = List.filled(5, false);
                                           togglePlayer(); // Toggle to the other player after a play
                                         }
@@ -370,6 +417,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               .scores.values
                                               .reduce((a, b) => a + b);
                                           // reset the round settings
+                                          _diceIndex = List<int>.filled(
+                                              _diceIndex.length, 0);
                                           chooseCategory = 7;
                                           _selectedDice = List.filled(5, false);
                                           togglePlayer(); // Toggle to the other player after a play

@@ -7,22 +7,54 @@ class Player {
     'Threes',
     'Fours',
     'Fives',
-    'Sixes'
+    'Sixes',
+    'Bonus',
+    'Three_of_a_kind',
+    'Four_of_a_kind',
+    'Small_Straight',
+    'Large_Straight',
+    'Yahtzee',
+    'Chance',
+    'Full_House'
   ];
   Map<String, int> scores = {
-    'Ones': 0,
-    'Twos': 0,
-    'Threes': 0,
-    'Fours': 0,
-    'Fives': 0,
-    'Sixes': 0,
-    'Three_of_a_kind': 0,
-    'Four_of_a_kind': 0,
-    'Small_Straight': 0,
-    'Large_Straight': 0,
-    'Yahtzee': 0,
-    'Chance': 0,
-    'Full_House': 0,
+    for (var category in [
+      'Ones',
+      'Twos',
+      'Threes',
+      'Fours',
+      'Fives',
+      'Sixes',
+      'Bonus',
+      'Three_of_a_kind',
+      'Four_of_a_kind',
+      'Small_Straight',
+      'Large_Straight',
+      'Yahtzee',
+      'Chance',
+      'Full_House'
+    ])
+      category: 0,
+  };
+
+  Map<String, bool> scored = {
+    for (var category in [
+      'Ones',
+      'Twos',
+      'Threes',
+      'Fours',
+      'Fives',
+      'Sixes',
+      'Bonus',
+      'Three_of_a_kind',
+      'Four_of_a_kind',
+      'Small_Straight',
+      'Large_Straight',
+      'Yahtzee',
+      'Chance',
+      'Full_House'
+    ])
+      category: false,
   };
 
   Player({required this.name});
@@ -30,6 +62,7 @@ class Player {
   void setScore(String category, int value) {
     if (scores.containsKey(category)) {
       scores[category] = value;
+      scored[category] = true; // Mark as scored
     }
   }
 
@@ -38,6 +71,7 @@ class Player {
   }
 
   bool getScored(String category) {
-    return scores[category] != 0;
+    return scored[category] ??
+        false; // Check if the score has been explicitly set
   }
 }
