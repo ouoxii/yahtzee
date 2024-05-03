@@ -164,8 +164,58 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // Randomly choose the starting player and ensure currentPlayer is non-null before usage
-    currentPlayer = (Random().nextBool()) ? player1 : player2;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showNameEntryDialog());
+  }
+
+  void _showNameEntryDialog() {
+    TextEditingController player1Controller = TextEditingController();
+    TextEditingController player2Controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Makes dialog modal
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Player Names"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: player1Controller,
+                decoration: InputDecoration(
+                  labelText: "Player 1 Name",
+                ),
+              ),
+              TextField(
+                controller: player2Controller,
+                decoration: InputDecoration(
+                  labelText: "Player 2 Name",
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Start Game"),
+              onPressed: () {
+                setState(() {
+                  player1.name = player1Controller.text.isNotEmpty
+                      ? player1Controller.text
+                      : "Player 1";
+                  player2.name = player2Controller.text.isNotEmpty
+                      ? player2Controller.text
+                      : "Player 2";
+                  currentPlayer = Random().nextBool()
+                      ? player1
+                      : player2; // Randomly choose the starting player
+                });
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void togglePlayer() {

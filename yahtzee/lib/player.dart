@@ -92,7 +92,7 @@ class Player {
 
     // Ensure that 'scored['Bonus']' is not null and has not been scored yet
     // Check if the sum is at least 63 and if the bonus has not been scored
-    if ((scored['Bonus'] ?? false) == false && upperSectionSum >= 10) {
+    if ((scored['Bonus'] ?? false) == false && upperSectionSum >= 63) {
       scores['Bonus'] = 35;
       scored['Bonus'] = true; // Mark the bonus as scored
     }
