@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yahtzee/player.dart';
+import 'package:yahtzee/score_display.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,9 +20,6 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter Demo'),
-        ),
         body: MyHomePage(),
       ),
     );
@@ -37,6 +35,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Player player1 = Player(name: 'usagi');
+  Player player2 = Player(name: 'monmonga'); // Added second player
+  Player currentPlayer = Player(name: 'default');
   List<bool> _selectedDice = List.filled(5, false);
   int chooseCategory = 7;
   int round = 0;
@@ -130,6 +130,18 @@ class _MyHomePageState extends State<MyHomePage> {
     return 0;
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Randomly choose the starting player and ensure currentPlayer is non-null before usage
+    currentPlayer = (Random().nextBool()) ? player1 : player2;
+  }
+
+  void togglePlayer() {
+    // Switch current player
+    currentPlayer = (currentPlayer == player1) ? player2 : player1;
+  }
+
   Widget scoreWidget(int index, List<String> categoryList, int offset) {
     bool isSelected = index + offset == chooseCategory;
     Color bgColor = isSelected ? Color(0xFFAE98B6) : Colors.transparent;
@@ -156,9 +168,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ), // Placeholder for any image or icon
             SizedBox(width: 10),
-            clipContainer('${player1.getScore(categoryList[index])}'),
+            clipContainer(
+                '${player1.getScore(categoryList[index])}'), // Score for player1
             SizedBox(width: 10),
-            clipContainer('${calculateScore(_diceIndex, categoryList[index])}'),
+            clipContainer(
+                '${player2.getScore(categoryList[index])}'), // Score for player2
+            SizedBox(width: 10),
+            clipContainer(
+                '${calculateScore(_diceIndex, categoryList[index])}'), // Potential score
           ],
         ),
       ),
@@ -184,38 +201,50 @@ class _MyHomePageState extends State<MyHomePage> {
       children: [
         Positioned(
           top: 0,
-          bottom: screenHeight * 0.3,
+          bottom: screenHeight * 0.25,
           left: 0,
           right: 0,
           child: Container(
             color: Color(0xFF846E89),
             child: Center(
               child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(categories.length,
-                          (index) => scoreWidget(index, categories, 0)),
+                  child: Column(
+                children: [
+                  Center(
+                    child: ScoreDisplay(
+                      player1Name: player1.name,
+                      player1Score: player1.score,
+                      player2Name: player2.name,
+                      player2Score: player2.score,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(categories2.length,
-                          (index) => scoreWidget(index, categories2, 10)),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(categories.length,
+                            (index) => scoreWidget(index, categories, 0)),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(categories2.length,
+                            (index) => scoreWidget(index, categories2, 10)),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
             ),
           ),
         ),
         Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
+          bottom: -10,
+          left: -8,
+          right: -8,
+          top: 500,
           child: Container(
             height: screenHeight * 0.3,
             decoration: BoxDecoration(
@@ -225,11 +254,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             child: Container(
-              //骰色子區
               margin: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  topRight: Radius.circular(30.0),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -309,35 +340,39 @@ class _MyHomePageState extends State<MyHomePage> {
                                     (chooseCategory < 6) ? mode = 1 : mode = 2;
                                     switch (mode) {
                                       case 1:
-                                        if (!player1.getScored(
+                                        if (!currentPlayer.getScored(
                                             categories[chooseCategory])) {
                                           var total = calculateScore(_diceIndex,
                                               categories[chooseCategory]);
-                                          player1.setScore(
+                                          currentPlayer.setScore(
                                               categories[chooseCategory],
                                               total);
                                           round = 0;
-                                          player1.score = player1.scores.values
+                                          currentPlayer.score = currentPlayer
+                                              .scores.values
                                               .reduce((a, b) => a + b);
                                           // reset the round settings
                                           chooseCategory = 7;
                                           _selectedDice = List.filled(5, false);
+                                          togglePlayer(); // Toggle to the other player after a play
                                         }
                                         break;
                                       case 2:
-                                        if (!player1.getScored(
+                                        if (!currentPlayer.getScored(
                                             categories2[chooseCategory - 10])) {
                                           var total = calculateScore(_diceIndex,
                                               categories2[chooseCategory - 10]);
-                                          player1.setScore(
+                                          currentPlayer.setScore(
                                               categories2[chooseCategory - 10],
                                               total);
                                           round = 0;
-                                          player1.score = player1.scores.values
+                                          currentPlayer.score = currentPlayer
+                                              .scores.values
                                               .reduce((a, b) => a + b);
                                           // reset the round settings
                                           chooseCategory = 7;
                                           _selectedDice = List.filled(5, false);
+                                          togglePlayer(); // Toggle to the other player after a play
                                         }
                                         break;
                                     }
