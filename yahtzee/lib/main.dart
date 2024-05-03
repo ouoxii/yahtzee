@@ -40,6 +40,12 @@ class _MyHomePageState extends State<MyHomePage> {
   List<bool> _selectedDice = List.filled(5, false);
   int chooseCategory = 7;
   int round = 0;
+  bool areAllCategoriesScored() {
+    return player1.scores.keys
+            .every((category) => player1.getScored(category)) &&
+        player2.scores.keys.every((category) => player2.getScored(category));
+  }
+
   List<String> _diceEmojis = [
     'casino',
     'one',
@@ -165,6 +171,38 @@ class _MyHomePageState extends State<MyHomePage> {
   void togglePlayer() {
     // Switch current player
     currentPlayer = (currentPlayer == player1) ? player2 : player1;
+  }
+
+  void checkAndHandleGameEnd() {
+    if (areAllCategoriesScored()) {
+      String resultMessage;
+      if (player1.score > player2.score) {
+        resultMessage = "${player1.name} wins!";
+      } else if (player2.score > player1.score) {
+        resultMessage = "${player2.name} wins!";
+      } else {
+        resultMessage = "It's a tie!";
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Game Over"),
+            content: Text(resultMessage),
+            actions: <Widget>[
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                  // Optionally reset the game here or navigate to a new screen
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Widget scoreWidget(int index, List<String> categoryList, int offset) {
@@ -427,6 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     }
                                   }
                                 });
+                                checkAndHandleGameEnd();
                               },
                               child: const Text('Play'),
                             ),
