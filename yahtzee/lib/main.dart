@@ -139,9 +139,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (category == 'Yahtzee') {
       if (dice.toSet().length == 1) {
-        return 50;
-      } else
+        // 如果骰子的所有點數都相同，即為 Yahtzee
+        if (player1.getScored('Yahtzee') && player1.getScore('Yahtzee') == 50) {
+          // 如果玩家已經得到過 Yahtzee，且得分為 50，則這次得分為 100
+          return 100;
+        } else {
+          // 第一次 Yahtzee 得 50 分
+          return 50;
+        }
+      } else {
         return 0;
+      }
     }
     if (category == 'Chance') {
       return dice.reduce((a, b) => a + b);
@@ -165,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     player1 = Player(name: 'Human', isAI: false);
-    player2 = Player(name: 'Computer', isAI: true); // Set AI player
+    player2 = Player(name: 'Computer', isAI: false); // Set AI player
     currentPlayer = player1; // Start with human player
     WidgetsBinding.instance.addPostFrameCallback((_) => _showNameEntryDialog());
   }
@@ -173,29 +181,53 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showNameEntryDialog() {
     TextEditingController player1Controller = TextEditingController();
     TextEditingController player2Controller = TextEditingController();
-
+    bool hasSecondPlayer = false;
     showDialog(
       context: context,
       barrierDismissible: false, // Makes dialog modal
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Enter Player Names"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: player1Controller,
-                decoration: InputDecoration(
-                  labelText: "Player 1 Name",
-                ),
-              ),
-              TextField(
-                controller: player2Controller,
-                decoration: InputDecoration(
-                  labelText: "Player 2 Name",
-                ),
-              ),
-            ],
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    controller: player1Controller,
+                    decoration: InputDecoration(
+                      labelText: "Player 1 Name",
+                    ),
+                  ),
+                  TextField(
+                    controller: player2Controller,
+                    decoration: InputDecoration(
+                      labelText: "Player 2 Name",
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text("Is player 2 a computer player? "),
+                      Checkbox(
+                        value: hasSecondPlayer,
+                        onChanged: (value) {
+                          setState(() {
+                            hasSecondPlayer = value!;
+                            if (value!) {
+                              player2Controller.text = "Computer";
+                              player2.isAI = true;
+                            } else {
+                              player2Controller.text = "";
+                              player2.isAI = false;
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
           actions: <Widget>[
             TextButton(
@@ -252,6 +284,22 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
+      // If no best category found, choose the first unscored category
+      if (bestCategory == null) {
+        for (var category in categories) {
+          if (!currentPlayer.getScored(category)) {
+            bestCategory = category;
+            break;
+          }
+        }
+        for (var category in categories2) {
+          if (!currentPlayer.getScored(category)) {
+            bestCategory = category;
+            break;
+          }
+        }
+      }
+
       // Execute the best move if there's a valid category selected
       if (bestCategory != null) {
         currentPlayer.setScore(bestCategory, bestScore);
@@ -275,9 +323,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void checkAndHandleGameEnd() {
     if (areAllCategoriesScored()) {
       String resultMessage;
-      if (player1.score > player2.score) {
+      int player1TotalScore = player1.score - player1.getScore('Bonus');
+      int player2TotalScore = player2.score - player2.getScore('Bonus');
+      if (player1TotalScore > player2TotalScore) {
         resultMessage = "${player1.name} wins!";
-      } else if (player2.score > player1.score) {
+      } else if (player2TotalScore > player1TotalScore) {
         resultMessage = "${player2.name} wins!";
       } else {
         resultMessage = "It's a tie!";
@@ -400,6 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           currentPlayer.name, // Pass the current player's name
                     ),
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [

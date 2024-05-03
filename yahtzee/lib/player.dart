@@ -58,7 +58,45 @@ class Player {
       category: false,
   };
 
-  Player({required this.name, this.isAI = false});
+  Player({required this.name, this.isAI = false})
+      : scores = {
+          for (var category in [
+            'Ones',
+            'Twos',
+            'Threes',
+            'Fours',
+            'Fives',
+            'Sixes',
+            'Bonus',
+            'Three_of_a_kind',
+            'Four_of_a_kind',
+            'Small_Straight',
+            'Large_Straight',
+            'Yahtzee',
+            'Chance',
+            'Full_House'
+          ])
+            category: category == 'Bonus' ? 0 : 0,
+        },
+        scored = {
+          for (var category in [
+            'Ones',
+            'Twos',
+            'Threes',
+            'Fours',
+            'Fives',
+            'Sixes',
+            'Bonus',
+            'Three_of_a_kind',
+            'Four_of_a_kind',
+            'Small_Straight',
+            'Large_Straight',
+            'Yahtzee',
+            'Chance',
+            'Full_House'
+          ])
+            category: category == 'Bonus' ? true : false,
+        };
 
   void setScore(String category, int value) {
     if (scores.containsKey(category)) {
